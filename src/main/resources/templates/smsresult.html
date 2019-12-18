@@ -1,0 +1,13 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SMS Receipt</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>Result</h1>
+<p th:text="'to: ' + ${SMS.to}" />
+<p th:text="'message: ' + ${SMS.message}" />
+<a href="/greeting">Send another SMS</a>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SMS Sender</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>Form</h1>
+<form action="#" th:action="@{/sms}" th:object="${sms}" method="post">
+    <p>To Number: <input type="text" th:field="*{to}" /></p>
+    <p>Message: <input type="text" th:field="*{message}" /></p>
+    <p><input type="submit" value="Send SMS" /> <input type="reset" value="Reset" /></p>
+</form>
+</body>
+</html>
