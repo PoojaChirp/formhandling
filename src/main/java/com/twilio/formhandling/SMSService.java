@@ -35,6 +35,6 @@ public class SMSService {
 
     public void receive(MultiValueMap<String, String> smscallback) {
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!Callback received from Twilio API!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        smscallback.forEach((key, value) -> System.out.println(key + ":" + value.get(0)));
+        smscallback.forEach((key, value) -> System.out.println(key + ":" + value));
     }
 }

@@ -1,41 +1,41 @@
 package com.twilio.formhandling;
 
 import com.twilio.formhandling.domain.SMS;
-import com.twilio.formhandling.domain.SMSCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@RestController
 public class SMSController {
 
     @Autowired
     SMSService service;
 
-    @GetMapping("/sms")
-    public String smsForm(Model model) {
-        SMS sms  = new SMS();
-       /* sms.setMessage("Hey Buddy");
-        sms.setTo("+13098264420");*/
-        model.addAttribute("sms", sms);
-        return "sms";
-    }
+    @Autowired
+    private SimpMessagingTemplate webSocket;
 
-    @PostMapping("/sms")
-    public String smsSubmit(@ModelAttribute SMS sms, Model model) {
+    @RequestMapping(value = "/sms", method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void smsSubmit(@RequestBody SMS sms) {
+        webSocket.convertAndSend("/topic/greetings", getTimeStamp() + ": Sending the SMS: "+sms.toString());
             service.send(sms);
-        return "smsresult";
+        webSocket.convertAndSend("/topic/greetings", getTimeStamp() + ": SMS has been sent!: "+sms.toString());
+
     }
 
     @RequestMapping(value = "/smscallback", method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String smsCallback(@RequestBody MultiValueMap<String, String> map) {
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void smsCallback(@RequestBody MultiValueMap<String, String> map) {
        service.receive(map);
-
-        return "smscallbackresult";
+       webSocket.convertAndSend("/topic/greetings", getTimeStamp() + ": Twilio has made a callback request! Here are the contents: "+map);
     }
 
+    private String getTimeStamp() {
+       return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
+    }
 }
